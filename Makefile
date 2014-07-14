@@ -1,10 +1,10 @@
 CC=g++
 CFLAGS=-lgsl -lgslcblas
-DEPS = allele.h environment.h modelFunctions.h population.h randomv.h runningStat.h 
+DEPS = src/allele.h src/environment.h src/modelFunctions.h src/population.h src/randomv.h src/runningStat.h 
 
-a:	tester.cpp allele.cpp environment.cpp modelFunctions.cpp population.cpp randomv.cpp runningStat.cpp stability.cpp
-	$(CC) -O3 -o a.out tester.cpp allele.cpp environment.cpp modelFunctions.cpp population.cpp randomv.cpp runningStat.cpp stability.cpp $(CFLAGS)
-geometry: geometry.cpp randomv.cpp modelFunctions.cpp environment.cpp
-	$(CC) -O3 -o geometry.exe geometry.cpp randomv.cpp modelFunctions.cpp environment.cpp $(CFLAGS)
+a:	src/tester.cpp src/allele.cpp src/environment.cpp src/modelFunctions.cpp src/population.cpp src/randomv.cpp src/runningStat.cpp src/stability.cpp
+	$(CC) -O3 -o bin/a.out src/tester.cpp src/allele.cpp src/environment.cpp src/modelFunctions.cpp src/population.cpp src/randomv.cpp src/runningStat.cpp src/stability.cpp $(CFLAGS)
+geometry: src/geometry.cpp src/randomv.cpp src/modelFunctions.cpp src/environment.cpp
+	$(CC) -O3 -o bin/geometry.exe src/geometry.cpp src/randomv.cpp src/modelFunctions.cpp src/environment.cpp $(CFLAGS)
 clean: 
-	rm -f a.out balanced.exe
+	rm -f bin/a.out bin/geometry.exe

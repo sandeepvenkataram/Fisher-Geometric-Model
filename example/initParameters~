@@ -1,0 +1,76 @@
+#   population parameters
+#   ---------------------
+# N population size (Idividuals)
+# u mutation rate
+# t maximum Time (generations) for the simulation
+# p ploidy
+
+N 5000
+u 0.000005
+p 2
+t 10000
+D 2
+
+
+#   model parameters
+#   ----------------
+
+#  Gaussian fitness function
+
+a 1
+b 0
+c 1
+d 2
+
+#  New mutations function
+
+#Type can be gamma, uniform, exponential or normal
+#the number of parameters depend on the function family
+# symbol|function(f)| parameters(m)
+#-------+-----------+-----------
+#  g    |gamma      | shape
+#  u    |uniform    | maximum
+#  e    |exponential| mu (mu = 1/lambda)
+#  n    |normal     | mean standard_deviation
+
+f e
+m .5
+
+#  environmental parameters
+# -------------------------
+
+# Changing environment: true
+C 0
+# step probability
+S 1
+# pEriodic change: false
+E 0
+#   Harmonic movement Frequency
+F xxx
+#   phase Phi (negative values randomize the phase)
+P -1
+# fixed Theta for movement (if not -PI<fixedTheta<=PI then randomized)
+T 9
+# random Walk (0 Wiener process, 1 Levy flight)
+W 0
+# sigma for gausian step in Wiener process
+s xxx
+# Alpha (scale) for Pareto step in Levy flight
+A 2
+# Beta (shape) for Pareto step in Levy flight
+B 1
+
+#    output parameters
+#   -------------------
+#  .table file
+#  .genome file
+#  .ts file
+#  .edgelist file
+
+
+# simulation run parameters
+#-------------------------
+#burnIn = 1000000
+#step   = 10000
+I 0
+J 200

@@ -247,7 +247,6 @@ int main(int argc, char* argv[]){
 	  sstr>>dummy;
 	  opt.push_back(dummy);
 	}
-	break;
       }
     }else{
       cout << "Unable to open file "<<file2name <<endl;
