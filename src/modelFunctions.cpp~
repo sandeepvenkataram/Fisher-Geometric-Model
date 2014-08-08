@@ -60,7 +60,7 @@ vector<double> modelFunctions::getMutationVector(randomv myR, int numDimensions)
 	return result;	
 }
 
-vector<double> modelFunctions::cartesianToPolar(vector<double> cart){ // actually converting it to hyperspherical coordinates for more than 2 dimensions, but naming due to legacy code
+vector<double> modelFunctions::cartesianToPolar(vector<double> cart){
 	double r = 0;
 	int numDim = cart.size();
 	vector<double> result;
@@ -98,7 +98,7 @@ vector<double> modelFunctions::cartesianToPolar(vector<double> cart){ // actuall
 	
 }
 
-vector<double> modelFunctions::polarToCartesian(vector<double> polar){ // convert hyperspherical coordinates into cartesian
+vector<double> modelFunctions::polarToCartesian(vector<double> polar){
 	double r = polar.front();
 	
 	vector<double> Cartesian;
@@ -148,7 +148,7 @@ double modelFunctions::getStep(randomv myR){
   return step;
 }
 
-double modelFunctions::vdistance(vector<double> a, vector<double> b, int print){ // distance between two polar coordinates
+double modelFunctions::vdistance(vector<double> a, vector<double> b, int print){
   vector<double> cartA = polarToCartesian(a);
   vector<double> cartB = polarToCartesian(b);
   double result;

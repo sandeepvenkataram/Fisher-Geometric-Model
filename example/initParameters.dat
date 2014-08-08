@@ -35,29 +35,11 @@ d 2
 f e
 m 0.5
 
-# Changing environment: true
-C 0
-# step probability
-S 1
-# pEriodic change: false
-E 0
-#   Harmonic movement Frequency
-F xxx
-#   phase Phi (negative values randomize the phase)
-P -1
-# fixed Theta for movement (if not -PI<fixedTheta<=PI then randomized)
-T 9
-# random Walk (0 Wiener process, 1 Levy flight)
-W 0
-# sigma for gausian step in Wiener process
-s xxx
-# Alpha (scale) for Pareto step in Levy flight
-A 2
-# Beta (shape) for Pareto step in Levy flight
-B 1
 
 # simulation run parameters
 #-------------------------
+#I = number of burn in generations
+#J = frequency of generations for generating output. J=1 means output is generated every generation
 I 0
 J 1
 

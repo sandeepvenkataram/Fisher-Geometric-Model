@@ -14,6 +14,12 @@
 #include "population.h"
 #include "runningStat.h"
 
+/*
+ * Main file to process inputs and run simulation
+ * 
+ */
+
+
 //version = 36;
 /*
   Two dimentional FISHER GEOMETRIC MODEL
@@ -247,6 +253,7 @@ int main(int argc, char* argv[]){
 	  sstr>>dummy;
 	  opt.push_back(dummy);
 	}
+	break;
       }
     }else{
       cout << "Unable to open file "<<file2name <<endl;

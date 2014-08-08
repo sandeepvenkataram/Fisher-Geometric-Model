@@ -206,10 +206,10 @@ void population::mutate(randomv &r, modelFunctions &myModelRef, environment &env
     i++;
   }
   unsigned int* mutations = new unsigned int [alleleNumber];
-  r.sampleMultinomial(alleles.size(),mutationNumber,Pmu,mutations); // sample alleles for mutating
+  r.sampleMultinomial(alleles.size(),mutationNumber,Pmu,mutations);
   vector<allele> mutants;
   int counter = 0;
-  for (vector<allele>::iterator it = alleles.begin();it != alleles.end();++it){ // loop through alleles, see which ones need to be mutated, and mutate them
+  for (vector<allele>::iterator it = alleles.begin();it != alleles.end();++it){
     if(mutations[counter]==0){
       counter++;
       continue;

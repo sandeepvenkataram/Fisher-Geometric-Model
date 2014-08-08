@@ -6,10 +6,6 @@
 #include "stability.h"
 using namespace std;
 
-/*
- * used to compute whether a set of alleles can be maintained as a stable polymorphism based on the fitness of every possible genotype. Uses the method of Kimura, Motoo. 1956. “RULES FOR TESTING STABILITY OF A SELECTIVE POLYMORPHISM.” Proceedings of the National Academy of Sciences of the United States of America 42 (6) (June): 336–40. doi:10.2307/89780.
- */
-
 stability::stability(vector<double> ws, int d){
   n = d;
   A = gsl_matrix_alloc(n,n);

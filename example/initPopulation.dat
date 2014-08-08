@@ -1,4 +1,4 @@
 #Initial population
-#time, p, r, id, w, birthday
+#time, p, r, allele_id, fitness_(not used), birthday_of_allele_in_generations
 1 1 2 0 1 1
 
