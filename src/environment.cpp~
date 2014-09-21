@@ -87,22 +87,11 @@ double environment::fW(vector<double> rv, modelFunctions &myModelRef){
 }
 
 double environment::diploidFitness(vector<double> a, vector<double> b, modelFunctions &m){
-  //todo: finding the diploid phenotype should be separated from finding the diploid fitness
-  //add vectords
+  //add vectors
   vector<double> newRv = m.add(a, b);
-//  for(int i=0; i<newRv.size();i++){
-//	cout<<"diploidFitness: "<<newRv[i]<<endl;
-//  }
-  //divide by 2
+  //divide by 2 as we are assuming phenotypes are completely co-dominant
   newRv.front()/=2.;
   //find fitness (distance from optimum is computed within fW)
   double wab = fW(newRv, m);
-
-  /*
-   *  double wa = fW(a,m);
-   *  double wb = fW(b,m);
-   *  double wab = (wa + wb)/2; //h=1/2 always
-   */
-
   return wab;
 }

@@ -70,6 +70,11 @@ double environment::fW(vector<double> rv, modelFunctions &myModelRef){
   if (myModelRef.getFitnessFunction() == 'g'){
     //gaussian
     w = myModelRef.getA()*exp((-1*pow(x,myModelRef.getD()))/(2*pow(myModelRef.getC(),2)));
+  }else if(myModelRef.getFitnessFunction() == 'q'){ // quadratic
+    w = 1-pow(x,2)/myModelRef.getA();
+    if(w<0){
+      w=0;
+    }
   }else if (myModelRef.getFitnessFunction() == 'l'){
     //linear
     if(x>=myModelRef.getMaxR()){

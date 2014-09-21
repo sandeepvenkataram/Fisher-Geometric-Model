@@ -108,7 +108,7 @@ int main(int argc, char* argv[]){
 	double u;	   //mutation rate
 	int	ploidy;  //ploidy
 	int	maxTime; //simulation time
-	char   f;	   //new mutation function
+	char   f, fw;	   //new mutation function
 	
 	//for fitness function
 	double		 a;		   //mean
@@ -158,6 +158,9 @@ int main(int argc, char* argv[]){
 	  break;
 	case 't':
 	  sstr >> maxTime;
+	  break;
+	case 'w':
+	  sstr >> fw;
 	  break;
 	case 'a':
 	  sstr >> a;
@@ -269,7 +272,7 @@ int main(int argc, char* argv[]){
    //  cout<<"Here 2"<<endl;
 	//assign parameters
 
-	myModelRef.setFitnessFunction('g');
+	myModelRef.setFitnessFunction(fw);
 	//	myModelRef.setMaxR(4);
 	myModelRef.setA(a);
 	myModelRef.setB(b);
