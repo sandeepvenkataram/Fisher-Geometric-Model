@@ -18,8 +18,13 @@ public:
   void change(randomv &r, modelFunctions &myModelRef, int t);
   double fW(vector<double> rv, modelFunctions &myModelRef);
   ///  double diploidFitness(vector<double> a, vector<double> b, randomv &r, modelFunctions &m); //find diploidFitness from
-  double diploidFitness(vector<double> a, vector<double> b, modelFunctions &m); //find diploidFitness from coordinates
+  double diploidFitness(vector<double> a, vector<double> b, modelFunctions &m); //find diploidFitness from coordinates of each allele
 
+  void setUsePredefinedMutations(bool x){usePredefinedMutations = x;}
+  bool getUsePredefinedMutations(void){return usePredefinedMutations;}
+  
+  void setPredefinedMutations(vector< vector<double> > &x){ predefinedMutations = x;}
+  vector< vector<double> > getPredefinedMutations(void){ return predefinedMutations;}
   //for Harmonic
   void   setF(double x){ f = x; }
   double getF(void){ return f; }
@@ -27,6 +32,7 @@ public:
   double getPhi(void){ return phi; }
   void   setFixedTheta(double x){ fixedTheta = x; }
   double getFixedTheta(void){ return fixedTheta; }
+  
 private:
   //for the harmonic motion of the mean
   double f;               //! Frequency
@@ -35,5 +41,8 @@ private:
   vector<double> optimum; //! Coordinates for the optimum
   bool periodic;          //! True if the environmental change is periodic
   int timeOfChange;       //! Most recent time the optimum changed
+  bool usePredefinedMutations;
+  vector< vector<double>> predefinedMutations;
+  
 };
 #endif

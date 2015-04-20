@@ -51,6 +51,7 @@ class modelFunctions {
   vector<double> polarToCartesian(vector<double> polar);
   vector<double> cartesianToPolar(vector<double> cart);
   vector<double> getMutationVector(randomv myR, int numDimensions);
+  vector<double> getMeanPhenotype(vector< vector<double> > alleles, vector<double> freqs);
   //global printing
   //  bool printTable;   //table of balanced pairs
  private:

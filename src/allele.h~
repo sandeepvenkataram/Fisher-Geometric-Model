@@ -39,6 +39,7 @@ class allele{
   
   vector<double> getCartesian(modelFunctions &myModelRef); //!return cartesian coordinates in vector
   void addSNP(int x){ SNPs.push_back(x); }
+  void addSNP(vector<int> x){ SNPs.insert(SNPs.end(),x.begin(),x.end()); }
   int length(void) {return SNPs.size(); } 
   void setSNPs( vector<int> x){ SNPs = x; }
   vector<int> getSNPs(void){ return SNPs; }

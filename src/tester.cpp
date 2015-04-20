@@ -108,7 +108,8 @@ int main(int argc, char* argv[]){
 	double u;	   //mutation rate
 	int	ploidy;  //ploidy
 	int	maxTime; //simulation time
-	char   f, fw;	   //new mutation function
+	char   f;	   //new mutation function
+	char fw; // fitness function type
 	
 	//for fitness function
 	double		 a;		   //mean
@@ -214,7 +215,7 @@ int main(int argc, char* argv[]){
 	  break;
 	case 'B':
 	  sstr >> beta;
-	break;
+	  break;
 	case 'I':
 	  sstr >> burnIn;
 	  break;
@@ -226,7 +227,7 @@ int main(int argc, char* argv[]){
 	  break;
 	default:
 	  {
-		cout<<"unknown parameter"<<endl;
+		cout<<"unknown parameter: "<<parameter<<" in line "<<line<<endl;
 		exit(1);
 	  }
 	}
@@ -240,23 +241,42 @@ int main(int argc, char* argv[]){
 	//read input files
 	//environment
 	vector<double> opt;
+	vector< vector<double> > possibleMutations;
 	ifstream envInit(file2name);
 	if (envInit.is_open()){
 	  while (! envInit.eof() ){
-	getline (envInit,line);
-	if (line.size() < 1 || line.at(0) == '#'){
-	  continue;	 //skip comments and empty lines
-	}
-	double dummy;
-	//split line to words
-	stringstream sstr(line);
-	//use same order as printStatus output
-	// so the end of a .ts file can be used
-	for (int c = 0; c<numDimensions; c++){
-	  sstr>>dummy;
-	  opt.push_back(dummy);
-	}
-	break;
+		getline (envInit,line);
+		if (line.size() < 1 || line.at(0) == '#'){
+			continue;	 //skip comments and empty lines
+		}
+		double dummy;
+		//split line to words
+		stringstream sstr(line);
+		//use same order as printStatus output
+		// so the end of a .ts file can be used
+		for (int c = 0; c<numDimensions; c++){
+			sstr>>dummy;
+			opt.push_back(dummy);
+		}
+		break;
+	  }
+	 
+	  while (! envInit.eof() ){
+		  getline (envInit,line);
+		  if (line.size() < 1 || line.at(0) == '#'){
+			  continue;	 //skip comments and empty lines
+		  }
+		  double dummy;
+		  //split line to words
+		  stringstream sstr(line);
+		  //use same order as printStatus output
+		  // so the end of a .ts file can be used
+		  vector<double> mutVec;
+		  for (int c = 0; c<numDimensions; c++){
+			  sstr>>dummy;
+			  mutVec.push_back(dummy);
+		  }
+		  possibleMutations.push_back(mutVec);
 	  }
 	}else{
 	  cout << "Unable to open file "<<file2name <<endl;
@@ -266,7 +286,11 @@ int main(int argc, char* argv[]){
 	
 	environment	  myEnvironment(opt);
 	environment	 &envRef = myEnvironment;
-	
+	if(possibleMutations.size()>0){
+		//cout<<"possible mutations in use"<<endl;
+		envRef.setUsePredefinedMutations(true);
+		envRef.setPredefinedMutations(possibleMutations);
+	}
   //  cout<<"Here 1"<<endl;
 
    //  cout<<"Here 2"<<endl;

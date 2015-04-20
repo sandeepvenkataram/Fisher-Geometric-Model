@@ -6,23 +6,32 @@
 #include "stability.h"
 using namespace std;
 
-/*
- * used to compute whether a set of alleles can be maintained as a stable polymorphism based on the fitness of every possible genotype. Uses the method of Kimura, Motoo. 1956. “RULES FOR TESTING STABILITY OF A SELECTIVE POLYMORPHISM.” Proceedings of the National Academy of Sciences of the United States of America 42 (6) (June): 336–40. doi:10.2307/89780.
- */
-
 stability::stability(vector<double> ws, int d){
   n = d;
   A = gsl_matrix_alloc(n,n);
+  A2 = gsl_matrix_alloc(n,n);
+  eqFreqs = gsl_matrix_alloc(n,1);
   int counter = 0;
+  determinantA = 0;
+  determinantSum = 0;
+  meanFitness = 0;
   for (int i = 0; i < n; i++){
     for (int j = i; j < n; j++){
       gsl_matrix_set(A,i,j, ws.at(counter));
+	  gsl_matrix_set(A2,i,j, ws.at(counter));
       if(i != j){
-	gsl_matrix_set(A,j,i, ws.at(counter)); //symmetric	
+	gsl_matrix_set(A,j,i, ws.at(counter)); //symmetric
+	gsl_matrix_set(A2,j,i, ws.at(counter)); //symmetric	
       }
       counter++;
     }
-  }  
+    gsl_matrix_set(eqFreqs,i,0,0);
+  }
+  int s2;
+  gsl_permutation *p2 = gsl_permutation_alloc(n);     
+  gsl_linalg_LU_decomp(A2,p2,&s2);
+  determinantA = gsl_linalg_LU_det(A2,s2);
+  gsl_permutation_free(p2);
 }
 
 int stability::negative_definite(gsl_matrix *M, int n)
@@ -50,7 +59,8 @@ int stability::delta_condition(gsl_matrix *M, int n)
   int condition=1;
 
   int s;
-
+  determinantSum = 0;
+  meanFitness = 0;
   for (int r=0; r<n; r++)
     {
       // calculate determinant delta_r from M by substituting all elements of the r-th column by 1 
@@ -71,16 +81,35 @@ int stability::delta_condition(gsl_matrix *M, int n)
       gsl_permutation *p = gsl_permutation_alloc(n);     
       gsl_linalg_LU_decomp(M_r,p,&s);
       double sgn = gsl_linalg_LU_sgndet(M_r,s);
-
+	  double detVal = gsl_linalg_LU_det(M_r,s);
+	  determinantSum= determinantSum + detVal;
       // check condition
-
-      if(pow(-1,n-1)*sgn<=0) { condition=0; }
+	  gsl_matrix_set(eqFreqs,r,0,detVal);
+      if(pow(-1.,n-1)*sgn<=0) { condition=0; }
 
       gsl_permutation_free(p);
       gsl_matrix_free(M_r);
     }
-
+  meanFitness = determinantA / determinantSum;
+  
+  
+  for (int r=0; r<n; r++)
+    {
+		gsl_matrix_set(eqFreqs,r,0,gsl_matrix_get(eqFreqs,r,0)/determinantSum);
+	}
+  
   return condition;
+}
+
+double stability::getMeanFitness(void){
+	if(meanFitness==0){
+		stable();
+	}
+	return meanFitness;
+}
+
+gsl_matrix* stability::getEqFreqs(void){
+	return eqFreqs;
 }
 
 int stability::stable(void){

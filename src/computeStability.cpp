@@ -1,7 +1,10 @@
 #include <vector>
 #include <iostream>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_eigen.h>
+#include <gsl/gsl_linalg.h>
 #include "stability.h"
-
 using namespace std;
 int main(int argc, char* argv[]){
 	if(argc < 3){
@@ -15,10 +18,10 @@ int main(int argc, char* argv[]){
 		exit(1);
 	}
 	
-	if(d==1){
+	/*if(d==1){
 		cout<<1<<endl;
 		exit(0);
-	}
+	}*/
 	
 	vector<double> vec;
 	
@@ -28,6 +31,11 @@ int main(int argc, char* argv[]){
 	
 	stability stab(vec,d);
 	int stable = stab.stable();
-	cout<<stable<<endl;
+	cout<<stable<<"\t"<<stab.getMeanFitness()<<"\t";
+	gsl_matrix *eqFreqs = stab.getEqFreqs();
+	for(int i=0; i<d; i++){
+		cout<<gsl_matrix_get(eqFreqs,i,0)<<"\t";
+	}
+	cout<<endl;
 
 }

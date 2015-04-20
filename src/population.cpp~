@@ -17,6 +17,7 @@ using namespace std;
 population::population(randomv &r, modelFunctions &myModelRef, vector<allele> &init, int pl, environment &envRef, ofstream &fsr){
   simTime         = 0;
   alleles         = init;
+  
   ploidy          = pl;
   wm              = updatewm(myModelRef, envRef); //initialize mean fitness
   alleleCounter   = alleles.size();
@@ -194,6 +195,7 @@ void population::mutate(randomv &r, modelFunctions &myModelRef, environment &env
   if (mutationNumber == 0){
     return;
   }
+  
   //fse<<u<<" "<<ploidy<<" "<<N<<" "<<mutationNumber<<" "<<alleles.size()<<endl;
   double newAlleleFrequency = 1./(ploidy*N); //haploid or diploid
   int alleleNumber = alleles.size();
@@ -206,55 +208,140 @@ void population::mutate(randomv &r, modelFunctions &myModelRef, environment &env
     i++;
   }
   unsigned int* mutations = new unsigned int [alleleNumber];
-  r.sampleMultinomial(alleles.size(),mutationNumber,Pmu,mutations);
+  r.sampleMultinomial(alleles.size(),mutationNumber,Pmu,mutations); // sample alleles for mutating
   vector<allele> mutants;
   int counter = 0;
-  for (vector<allele>::iterator it = alleles.begin();it != alleles.end();++it){
+  for (vector<allele>::iterator it = alleles.begin();it != alleles.end();++it){ // loop through alleles, see which ones need to be mutated, and mutate them
     if(mutations[counter]==0){
       counter++;
       continue;
     }
     double pi = (*it).getP();
+	allele * parentAllele = &(*it);
     vector<double> rv = (*it).getRv();
     int id = (*it).getId();
+	//cerr<<"new mutation on allele "<<id<<" in generation "<<simTime<<endl;
     //create new mutation vector
     for(int i = 0; i<mutations[counter]; i++){
-	//fse<<id<<" "<<counter<<" "<<mutations[counter]<<endl;
-      vector<double> mutation = myModelRef.getMutationVector(r, myModelRef.getNumDimensions());
-      vector<double> newRv = myModelRef.add(mutation, rv);
-      allele newAllele(newAlleleFrequency,newRv, myModelRef);
-      newAllele.setId(alleleCounter);
-      newAllele.setIdp(id);
-      newAllele.setBd(simTime);
-      double wmutated = envRef.fW(newRv,myModelRef);
-     // (*it).setfW(envRef.fW(rvi,myModelRef)); //!recalculate the fitness every generation in case the optimum moved
-      double wmutant = (*it).getfW();
-      newAllele.setfW(wmutated);
-      newAllele.setPhe(wmutated - wmutant); // new -old
-      newAllele.setDistance(mutation[0]);
-      //if repeats >> 1 can produce very large output
-      fse<<id<<' '<<alleleCounter<<' '<<simTime;
-      for(int j=0; j<mutation.size();++j){
-	      fse<<' '<<mutation[j];
-      }
-      for(int j=0; j<rv.size();++j){
-	      fse<<' '<<rv[j];
-      }
-      for(int j=0; j<newRv.size();++j){
-	      fse<<' '<<newRv[j];
-      }
-      
-      fse<<' '<<wmutant<<' '<<wmutated<<endl; //parent
-      //fse<<id<<' '<<alleleCounter<<' '<<simTime<<endl; //parent offspring time
-      newAllele.addSNP(alleleCounter);
-      alleleCounter++;
-      //reduce the frequency of the mutated one
-      if (pi > newAlleleFrequency){
-	(*it).setP(pi-newAlleleFrequency);
+      //fse<<id<<" "<<counter<<" "<<mutations[counter]<<endl;
+      if(envRef.getUsePredefinedMutations() ){
+        vector< vector<double> > possibleMutations = envRef.getPredefinedMutations();
+		vector<int> possibleMutationIndices;
+		for(int k=0; k<possibleMutations.size();k++){
+			possibleMutationIndices.push_back(k);
+		}
+		
+		allele &alCur = (*it);
+		vector<int> alSNPs = alCur.getSNPs();
+		vector<int> remainingIndices;
+		std::sort (alSNPs.begin(), alSNPs.end());
+		std::set_difference(possibleMutationIndices.begin(), possibleMutationIndices.end(), alSNPs.begin(), alSNPs.end(), std::inserter(remainingIndices, remainingIndices.begin()));
+		if(remainingIndices.size()==0){
+			if((*it).getP()>0.05){ //allele with all mutations is at reasonable frequency
+				cerr<<"simulation is done"<<endl;
+				exit(0);
+			}
+			//cerr<<"no mutations left!"<<endl;
+			break;
+		}
+		//cerr<<"sampling uniform int"<<endl;
+		int randIdex = r.sampleUniformInt(remainingIndices.size());
+		//cerr<<"getting mutation vector"<<endl;
+		vector<double> mutation = possibleMutations[remainingIndices[randIdex]];
+		vector<double> newRv = myModelRef.add(mutation, rv);
+		
+		//cerr<<"making new allele"<<endl;
+		allele newAllele(newAlleleFrequency,newRv, myModelRef);
+		newAllele.setId(alleleCounter);
+		newAllele.setIdp(id);
+		//newAllele.setParentAllele(parentAllele);
+		newAllele.setBd(simTime);
+		double wmutated = envRef.fW(newRv,myModelRef);
+		// (*it).setfW(envRef.fW(rvi,myModelRef)); //!recalculate the fitness every generation in case the optimum moved
+		double wmutant = (*it).getfW();
+		newAllele.setfW(wmutated);
+		newAllele.setPhe(wmutated - wmutant); // new -old
+		newAllele.setDistance(mutation[0]);
+		//if repeats >> 1 can produce very large output
+		fse<<id<<' '<<alleleCounter<<' '<<simTime;
+		for(int j=0; j<mutation.size();++j){
+			fse<<' '<<mutation[j];
+		}
+		for(int j=0; j<rv.size();++j){
+			fse<<' '<<rv[j];
+		}
+		for(int j=0; j<newRv.size();++j){
+			fse<<' '<<newRv[j];
+		}
+		
+		fse<<' '<<wmutant<<' '<<wmutated<<endl; //parent
+		//fse<<id<<' '<<alleleCounter<<' '<<simTime<<endl; //parent offspring time
+		newAllele.setSNPs((*it).getSNPs());
+		newAllele.addSNP(remainingIndices[randIdex]);
+		vector<int> newAlleleSNPs = newAllele.getSNPs();
+		sort(newAlleleSNPs.begin(), newAlleleSNPs.end());
+		bool foundAlleleExisting = false;
+		for (vector<allele>::iterator it2 = alleles.begin();it2 != alleles.end();++it2){ // loop through alleles, see which ones need to be mutated, and mutate them
+			vector<int> otherAllele = (*it2).getSNPs();
+			sort(otherAllele.begin(), otherAllele.end());
+			vector<int> diff;
+			std::set_difference(newAlleleSNPs.begin(), newAlleleSNPs.end(), otherAllele.begin(), otherAllele.end(), std::inserter(diff, diff.begin()));
+			if(diff.size()==0){
+				foundAlleleExisting = true;
+			}
+		}
+		if(foundAlleleExisting){
+			break;
+		}
+		
+		alleleCounter++;
+		//reduce the frequency of the mutated one
+		if (pi > newAlleleFrequency){
+			(*it).setP(pi-newAlleleFrequency);
+		}else{
+			(*it).setP(0);
+		}
+		mutants.push_back(newAllele);  
+		
+		// check i
       }else{
-	(*it).setP(0);
-      }
-      mutants.push_back(newAllele);  
+		vector<double> mutation = myModelRef.getMutationVector(r, myModelRef.getNumDimensions());
+		vector<double> newRv = myModelRef.add(mutation, rv);
+		allele newAllele(newAlleleFrequency,newRv, myModelRef);
+		newAllele.setId(alleleCounter);
+		newAllele.setIdp(id);
+		//newAllele.setParentAllele(parentAllele);
+		newAllele.setBd(simTime);
+		double wmutated = envRef.fW(newRv,myModelRef);
+		// (*it).setfW(envRef.fW(rvi,myModelRef)); //!recalculate the fitness every generation in case the optimum moved
+		double wmutant = (*it).getfW();
+		newAllele.setfW(wmutated);
+		newAllele.setPhe(wmutated - wmutant); // new -old
+		newAllele.setDistance(mutation[0]);
+		//if repeats >> 1 can produce very large output
+		fse<<id<<' '<<alleleCounter<<' '<<simTime;
+		for(int j=0; j<mutation.size();++j){
+			fse<<' '<<mutation[j];
+		}
+		for(int j=0; j<rv.size();++j){
+			fse<<' '<<rv[j];
+		}
+		for(int j=0; j<newRv.size();++j){
+			fse<<' '<<newRv[j];
+		}
+		
+		fse<<' '<<wmutant<<' '<<wmutated<<endl; //parent
+		//fse<<id<<' '<<alleleCounter<<' '<<simTime<<endl; //parent offspring time
+		newAllele.addSNP(alleleCounter);
+		alleleCounter++;
+		//reduce the frequency of the mutated one
+		if (pi > newAlleleFrequency){
+		(*it).setP(pi-newAlleleFrequency);
+		}else{
+		(*it).setP(0);
+		}
+		mutants.push_back(newAllele);  
+	  }
     }
     
       counter++;
@@ -283,53 +370,51 @@ void population::propagate(randomv &r, modelFunctions &myModelRef, environment &
  // cout<<"propagate2 "<<alleles.size()<<endl;
   wildW = 0;
   //find number of descendants for each genotype
-  for (vector<allele>::iterator it = alleles.begin();
-       it != alleles.end();++it){
-    double pi = (*it).getP();   
-    vector<double> rvi = (*it).getRv();
-   // for(int i=0; i<rvi.size();i++){
-//	    cout<<"allele1 "<<rvi[i]<<endl;
-   // }
-    double pd = 0;
-    int iid = (*it).getId();
-   // (*it).setfW(envRef.fW(rvi,myModelRef)); //!recalculate the fitness every generation in case the optimum moved
-    double wi = (*it).getfW();
-    if(wi>wildW){
-      wildW = wi;
-    }
-   // cout<<pi<<" "<<pd<<" "<<iid<<" "<<wi<<endl;
-    //haploid or diploid
-    if (ploidy == 2){
-      for(vector<allele>::iterator jt = alleles.begin();
-	  jt!= alleles.end();++jt){
-	//      cout<<"Inner Loop: "<<endl;
-	double pj = (*jt).getP();
-	
-	vector<double> rvj = (*jt).getRv();
-     //  for(int i=0; i<rvj.size();i++){
-//	    cout<<"allele2 "<<rvj[i]<<endl;
-   // }
-	int jid = (*jt).getId();
-	//find fitness of diploid genotype
-	double wij = envRef.diploidFitness(rvi, rvj, myModelRef);
-	//compute new frequency after selection
-	pd += pi*pj*wij;
-      }
-    }else if (ploidy == 1){
-      pd += pi*wi;
-    }else {
-      cerr <<"error 1"<<endl;
-      exit(1);
-    }
-    if (wm != 0){
-      pd = pd/wm; // divide once
-    }else{
-      cerr<<"error 2"<<endl;
-      exit(1);
-    }
-    (*it).setP(pd);
-    pds[counter] = pd;
-    counter++;
+  for (vector<allele>::iterator it = alleles.begin(); it != alleles.end();++it){
+		double pi = (*it).getP();   
+		vector<double> rvi = (*it).getRv();
+		// for(int i=0; i<rvi.size();i++){
+		//	    cout<<"allele1 "<<rvi[i]<<endl;
+		// }
+		double pd = 0;
+		int iid = (*it).getId();
+		// (*it).setfW(envRef.fW(rvi,myModelRef)); //!recalculate the fitness every generation in case the optimum moved
+		double wi = (*it).getfW();
+		if(wi>wildW){
+			wildW = wi;
+		}
+		// cout<<pi<<" "<<pd<<" "<<iid<<" "<<wi<<endl;
+		//haploid or diploid
+		if (ploidy == 2){
+			for(vector<allele>::iterator jt = alleles.begin();jt!= alleles.end();++jt){
+				//      cout<<"Inner Loop: "<<endl;
+				double pj = (*jt).getP();
+
+				vector<double> rvj = (*jt).getRv();
+				//  for(int i=0; i<rvj.size();i++){
+				//	    cout<<"allele2 "<<rvj[i]<<endl;
+				// }
+				int jid = (*jt).getId();
+				//find fitness of diploid genotype
+				double wij = envRef.diploidFitness(rvi, rvj, myModelRef);
+				//compute new frequency after selection
+				pd += pi*pj*wij;
+			}
+		}else if (ploidy == 1){
+			pd += pi*wi;
+		}else {
+			cerr <<"error 1"<<endl;
+			exit(1);
+		}
+		if (wm != 0){
+			pd = pd/wm; // divide once
+		}else{
+			cerr<<"error 2"<<endl;
+			exit(1);
+		}
+		(*it).setP(pd);
+		pds[counter] = pd;
+		counter++;
   }
  // cout<<"propagate3"<<endl;
   counter = 0;
@@ -337,8 +422,7 @@ void population::propagate(randomv &r, modelFunctions &myModelRef, environment &
   r.sampleMultinomial(alleleNumber, ploidy*N, pds, newGeneration); 
   //create new generation with appropriate frequences
  // cout<<"propagate4"<<endl;
-  for (vector<allele>::iterator it = alleles.begin();     
-       it != alleles.end();){
+  for (vector<allele>::iterator it = alleles.begin(); it != alleles.end();){
     if (newGeneration[counter] == 0){ //allele extinction
       alleles.erase(it);
     }else{

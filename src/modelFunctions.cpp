@@ -148,6 +148,24 @@ double modelFunctions::getStep(randomv myR){
   return step;
 }
 
+vector<double> modelFunctions::getMeanPhenotype(vector< vector<double> > alleles, vector<double> freqs){
+	vector<double> resultPhenotype;
+	if(alleles.size()!=freqs.size()){
+		return resultPhenotype;
+	}
+	for(int i=0; i<getNumDimensions();i++){ // initialize vector, and compute vector magnitude
+		resultPhenotype.push_back(0);
+	}
+	
+	for(int i=0; i<alleles.size(); i++){
+		vector<double> cartVec = polarToCartesian(alleles[i]);
+		for(int j=0; j<cartVec.size(); j++){
+			resultPhenotype[j]+=cartVec[j]*freqs[i];
+		}
+	}
+	return cartesianToPolar(resultPhenotype);
+}
+
 double modelFunctions::vdistance(vector<double> a, vector<double> b, int print){ // distance between two polar coordinates
   vector<double> cartA = polarToCartesian(a);
   vector<double> cartB = polarToCartesian(b);

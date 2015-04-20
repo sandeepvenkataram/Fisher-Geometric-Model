@@ -67,9 +67,16 @@ double environment::fW(vector<double> rv, modelFunctions &myModelRef){
 
   double x = myModelRef.vdistance(rv, optimum,0);
   //apply fitness function
+  //cout<<"current distance is "<<x<<endl;
   if (myModelRef.getFitnessFunction() == 'g'){
     //gaussian
     w = myModelRef.getA()*exp((-1*pow(x,myModelRef.getD()))/(2*pow(myModelRef.getC(),2)));
+	//cout<<x<<"\t"<<w<<endl;
+  }else if(myModelRef.getFitnessFunction() == 'q'){ // quadratic
+    w = 1-pow(x,2)/myModelRef.getA();
+    if(w<0){
+      w=0;
+    }
   }else if (myModelRef.getFitnessFunction() == 'l'){
     //linear
     if(x>=myModelRef.getMaxR()){
