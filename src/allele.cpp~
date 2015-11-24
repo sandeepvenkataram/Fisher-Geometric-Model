@@ -35,6 +35,11 @@ allele::allele(double a, vector <double> b, modelFunctions &myModelRef){
 
 }
 
+double allele::getW(modelFunctions &myModelRef, environment &envRef){
+  double w = envRef.fW(rv, myModelRef);
+  return w;
+}
+
 /* unused
 void allele::incrBalanced(int a){
   if (balanced.size() < a+1){

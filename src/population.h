@@ -43,6 +43,8 @@ class population{
   //  void           addb(int a, int b); //add a pair of balancing alleles to table
   //  void           printTable(void); //output table
   int            printStates(modelFunctions &myModelRef, environment &envRef, ofstream &fsr);  //print allele pairs interaction terms
+  
+
   /*//not used
    *  double getHetA(void) { return hetA; }
    *  double getHetB(void) { return hetB; }

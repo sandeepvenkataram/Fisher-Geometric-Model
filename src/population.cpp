@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cmath>
 #include <limits>
+#include <sstream>
 #include <gsl/gsl_sort.h>
 #include <iterator>
 #include "randomv.h"
@@ -42,9 +43,13 @@ double population::FindNeutralSphere(modelFunctions &myModelRef){
 }
 
 void population::evolve(randomv &r, modelFunctions &myModelRef, environment &envRef, ofstream &fse){
+  //cout<<"starting evolve generation "<<simTime<<endl;
   mutate(r, myModelRef, envRef, fse);
+  //cout<<"end mutate "<<simTime<<endl;
   propagate(r, myModelRef, envRef);
+  //cout<<"end propagate "<<simTime<<endl;
   wm = updatewm(myModelRef, envRef);
+  //cout<<"end updatewm "<<simTime<<endl;
   if (alleles.size() == 1){
     alleles.front().setFixed(true);
   }
@@ -166,7 +171,7 @@ int population::printStates(modelFunctions &myModelRef, environment &envRef, ofs
       double pj = (*jt).getP();
       vector<double> rvj = (*jt).getRv();
       double wj = (*jt).getfW();
-      double wij = envRef.diploidFitness(rvi, rvj, myModelRef);
+	  double wij = envRef.diploidFitness(rvi, rvj, myModelRef);
       int state = myModelRef.getStates(wi, wj, wij);
     
       fsr<<simTime<<' '<<idi<<' '<<idj<<' '<<state<<' '<<wi<<' '<<wj<<' '<<wij<<endl;
@@ -259,6 +264,11 @@ void population::mutate(randomv &r, modelFunctions &myModelRef, environment &env
 		double wmutated = envRef.fW(newRv,myModelRef);
 		// (*it).setfW(envRef.fW(rvi,myModelRef)); //!recalculate the fitness every generation in case the optimum moved
 		double wmutant = (*it).getfW();
+		if(isnan(wmutated)){
+			cout<<"We have an nan fitness! "<<alleleCounter<<endl;
+			exit(1);
+			
+		}
 		newAllele.setfW(wmutated);
 		newAllele.setPhe(wmutated - wmutant); // new -old
 		newAllele.setDistance(mutation[0]);
@@ -298,6 +308,7 @@ void population::mutate(randomv &r, modelFunctions &myModelRef, environment &env
 		//reduce the frequency of the mutated one
 		if (pi > newAlleleFrequency){
 			(*it).setP(pi-newAlleleFrequency);
+			pi = pi-newAlleleFrequency;
 		}else{
 			(*it).setP(0);
 		}
@@ -313,8 +324,29 @@ void population::mutate(randomv &r, modelFunctions &myModelRef, environment &env
 		//newAllele.setParentAllele(parentAllele);
 		newAllele.setBd(simTime);
 		double wmutated = envRef.fW(newRv,myModelRef);
-		// (*it).setfW(envRef.fW(rvi,myModelRef)); //!recalculate the fitness every generation in case the optimum moved
+		// (*it).setfW(fW(rvi,myModelRef)); //!recalculate the fitness every generation in case the optimum moved
 		double wmutant = (*it).getfW();
+		if(isnan(wmutated)){
+			//wmutated = envRef.fW(newRv,myModelRef);
+			cout<<"We have an nan fitness! "<<alleleCounter<<endl;
+			//cout<<"recacluated distance and fitness "<<x<<" "<<w<<endl;
+			exit(1);
+			
+		}
+		/*if(isnan(wmutated)){
+			
+			double oldFit = envRef.fW(rv,myModelRef);
+			vector<double> opt = envRef.getOptimum();
+			double a = myModelRef.getA();
+			double x = myModelRef.vdistance(newRv, opt,0);
+			double w = myModelRef.getA()*exp((-1*pow(x,myModelRef.getD()))/(2*pow(myModelRef.getC(),2)));
+			cout<<"We have an nan fitness again! "<<alleleCounter<<endl;
+			cout<<"old allele fitness "<<oldFit<<endl;
+			cout<<"optimum "<<opt.size()<<" "<<opt[0]<<" "<<opt[1]<<endl;
+			cout<<"model a "<<a<<endl;
+			cout<<"recomputed fitness "<<x<<" "<<w<<endl;
+			exit(1);
+		}*/
 		newAllele.setfW(wmutated);
 		newAllele.setPhe(wmutated - wmutant); // new -old
 		newAllele.setDistance(mutation[0]);
@@ -336,9 +368,10 @@ void population::mutate(randomv &r, modelFunctions &myModelRef, environment &env
 		alleleCounter++;
 		//reduce the frequency of the mutated one
 		if (pi > newAlleleFrequency){
-		(*it).setP(pi-newAlleleFrequency);
+			(*it).setP(pi-newAlleleFrequency);
+			pi = pi-newAlleleFrequency;
 		}else{
-		(*it).setP(0);
+			(*it).setP(0);
 		}
 		mutants.push_back(newAllele);  
 	  }
@@ -359,27 +392,42 @@ void population::propagate(randomv &r, modelFunctions &myModelRef, environment &
   //build array of pd's 
   int alleleNumber = alleles.size();
   double pds[alleleNumber];
+  int alleleIDs[alleleNumber];
+  double freqs[alleleNumber];
+  double fitness[alleleNumber];
   //build array of offspring numbers
   unsigned int* newGeneration = new unsigned int [alleleNumber];
- // cout<<"propagate1"<<endl;
+  //cout<<"propagate1"<<endl;
   //initialize
   for (int i = 0; i < alleleNumber; i++){
     pds[i] = 0;
+	freqs[i]=0;
     newGeneration[i] = 0;
   }
- // cout<<"propagate2 "<<alleles.size()<<endl;
+  //cout<<"propagate2 "<<alleles.size()<<endl;
   wildW = 0;
   //find number of descendants for each genotype
+  double currentAlleleFreqSum = 0;
+  double allPdsSum = 0;
   for (vector<allele>::iterator it = alleles.begin(); it != alleles.end();++it){
-		double pi = (*it).getP();   
+		double pi = (*it).getP(); 
+		freqs[counter]=pi;
+		
+		if(pi < 0 || pi > 1){
+			cout <<" in loop bad allele freq "<<pi<<endl;
+			exit(1);
+		}
+		currentAlleleFreqSum = currentAlleleFreqSum + pi;
 		vector<double> rvi = (*it).getRv();
 		// for(int i=0; i<rvi.size();i++){
 		//	    cout<<"allele1 "<<rvi[i]<<endl;
 		// }
 		double pd = 0;
 		int iid = (*it).getId();
-		// (*it).setfW(envRef.fW(rvi,myModelRef)); //!recalculate the fitness every generation in case the optimum moved
+		alleleIDs[counter] = iid;
+		// (*it).setfW(envRef.fW(rvi, myModelRef)); //!recalculate the fitness every generation in case the optimum moved
 		double wi = (*it).getfW();
+		fitness[counter]=wi;
 		if(wi>wildW){
 			wildW = wi;
 		}
@@ -396,7 +444,7 @@ void population::propagate(randomv &r, modelFunctions &myModelRef, environment &
 				// }
 				int jid = (*jt).getId();
 				//find fitness of diploid genotype
-				double wij = envRef.diploidFitness(rvi, rvj, myModelRef);
+				double wij = envRef.diploidFitness(rvi, rvj,  myModelRef);
 				//compute new frequency after selection
 				pd += pi*pj*wij;
 			}
@@ -412,16 +460,36 @@ void population::propagate(randomv &r, modelFunctions &myModelRef, environment &
 			cerr<<"error 2"<<endl;
 			exit(1);
 		}
-		(*it).setP(pd);
+		//(*it).setP(pd);
 		pds[counter] = pd;
+		allPdsSum = allPdsSum + pd;
 		counter++;
   }
- // cout<<"propagate3"<<endl;
+  
+  std::ostringstream strs;
+  strs << currentAlleleFreqSum;
+  std::string str = strs.str();
+  if(str.compare("1")!=0){
+	  cout<<"after loop bad total allele freq "<<str<<endl;
+	  for (vector<allele>::iterator it = alleles.begin(); it != alleles.end(); ++it){
+		  double pi = (*it).getP();
+		  vector<double> rvi = (*it).getRv();
+		  double wi = (*it).getfW();
+		  int iid = (*it).getId();
+		  cout<<iid<<" "<<pi<<" "<<wi<<endl;
+	  }
+	  exit(1);
+  }
+  //cout<<"propagate3 "<<alleleNumber<<" "<<counter<<endl;
   counter = 0;
+  //cout<<alleleNumber<<" "<<ploidy*N<<endl;
+  //for(int i=0; i<alleleNumber; i++){
+//	cout<<alleleIDs[i]<<" "<<freqs[i]<<" "<<fitness[i]<<" "<<pds[i]<<endl;
+  //}
   //multinomial sampling to find out how many offspring
   r.sampleMultinomial(alleleNumber, ploidy*N, pds, newGeneration); 
   //create new generation with appropriate frequences
- // cout<<"propagate4"<<endl;
+  //cout<<"propagate4"<<endl;
   for (vector<allele>::iterator it = alleles.begin(); it != alleles.end();){
     if (newGeneration[counter] == 0){ //allele extinction
       alleles.erase(it);
@@ -431,55 +499,63 @@ void population::propagate(randomv &r, modelFunctions &myModelRef, environment &
     }
     counter++;
   }
+  //cout<<"propagate5"<<endl;
   delete[] newGeneration;
 }
 
 double population::updatewm(modelFunctions &myModelRef, environment &envRef){
-  double sum = 0;
-  double varsumSqr = 0; // for calculating the variance
-  maxGenW = 0; //recalculate at each generation
-  for (vector<allele>::iterator it = alleles.begin(); it !=alleles.end(); ++it){
-    double pi = (*it).getP();
-    vector<double> rvi = (*it).getRv();
-    double wi = (*it).getfW();
-    int iid = (*it).getId();
-    if (ploidy == 2){ 	//haploid or diploid
-      for (vector<allele>::iterator jt = it;  jt !=alleles.end(); ++jt){
-	double pj = (*jt).getP();
-	vector<double> rvj = (*jt).getRv();
-	int jid = (*jt).getId();
-	double wij = envRef.diploidFitness(rvi, rvj, myModelRef);
-	if(wij > maxWij){
-	  maxWij = wij;
+	double sum = 0;
+	double varsumSqr = 0; // for calculating the variance
+	maxGenW = 0; //recalculate at each generation
+	//cout<<"updatewm"<<endl;
+	for (vector<allele>::iterator it = alleles.begin(); it !=alleles.end(); ++it){
+		double pi = (*it).getP();
+		vector<double> rvi = (*it).getRv();
+		double wi = envRef.fW(rvi,myModelRef);
+		(*it).setfW(wi);
+		int iid = (*it).getId();
+		
+		//cout<<pi<<" "<<wi<<" "<<rvi[0]<<" "<<rvi[1]<<" "<<iid<<endl;
+		if (ploidy == 2){ 	//haploid or diploid
+			for (vector<allele>::iterator jt = it;  jt !=alleles.end(); ++jt){
+				double pj = (*jt).getP();
+				vector<double> rvj = (*jt).getRv();
+				int jid = (*jt).getId();
+				double wij = envRef.diploidFitness(rvi, rvj,  myModelRef);
+				if(wij > maxWij){
+					maxWij = wij;
+				}
+				if(wij > maxGenW){
+					maxGenW = wij;
+				}
+				if (iid != jid){
+					varsumSqr += 2*pi*pj*wij*wij;
+					sum += 2*pi*pj*wij; //== pi*pj*wij + pj*pi*wji, wij=wji
+				}else{
+					varsumSqr += pi*pj*wij*wij;
+					sum += pi*pj*wij; //== pi*pj*wij, wij = wji
+				}
+			}
+		}else if (ploidy == 1){
+			if(wi > maxGenW){
+				maxGenW = wi;
+			}
+			varsumSqr += pi*wi*wi;
+			sum += pi*wi;
+		}else {
+			cerr<<"error 3"<<endl;
+			exit(1);
+		}
 	}
-	if(wij > maxGenW){
-	  maxGenW = wij;
-	}
-	if (iid != jid){
-	  varsumSqr += 2*pi*pj*wij*wij;
-	  sum += 2*pi*pj*wij; //== pi*pj*wij + pj*pi*wji, wij=wji
+	if(alleles.size() == 1){
+		var = 0;
 	}else{
-	  varsumSqr += pi*pj*wij*wij;
-	  sum += pi*pj*wij; //== pi*pj*wij, wij = wji
+		var = varsumSqr - sum*sum;
 	}
-      }
-    }else if (ploidy == 1){
-      if(wi > maxGenW){
-	maxGenW = wi;
-      }
-      varsumSqr += pi*wi*wi;
-      sum += pi*wi;
-    }else {
-      cerr<<"error 3"<<endl;
-      exit(1);
-    }
-  }
-  if(alleles.size() == 1){
-    var = 0;
-  }else{
-    var = varsumSqr - sum*sum;
-  }
-  return sum;
+	if(sum<=0 || sum > 1){
+		cout<<"mean fitness out of range in updatewm "<<sum<<endl;
+	}
+	return sum;
 }
 
 int population::isAdapted(modelFunctions &myModelRef, environment &envRef){
@@ -627,7 +703,7 @@ bool population::areBalanced(modelFunctions &myModelRef, environment &envRef){
        it !=alleles.end(); ++it){ 
     vector<double> rvi = (*it).getRv();
     double pi = (*it).getP();
-    double wi = (*it).getfW();
+    double wi = envRef.fW(rvi,myModelRef);
     double d = 0.05;
     //    int age = simTime - (*it).getBd();
     if (pi > d && pi < (1-d)){
@@ -640,7 +716,7 @@ bool population::areBalanced(modelFunctions &myModelRef, environment &envRef){
 	if(pj > d && pi < (1-d)){
 	  vector<double> rvj = (*jt).getRv();
 	  double wj = (*jt).getfW();
-	  double wij = envRef.diploidFitness(rvi, rvj, myModelRef);
+	  double wij = envRef.diploidFitness(rvi, rvj,  myModelRef);
 	  wVector.push_back(wij);
 	  double diff = wij-max(wi,wj);
 	  if(maxWDiff < diff){

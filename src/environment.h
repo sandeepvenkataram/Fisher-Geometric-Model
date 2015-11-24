@@ -16,10 +16,10 @@ public:
   bool getPeriodic( void ){ return periodic; }
   int getTimeOfChange(void){return timeOfChange; }
   void change(randomv &r, modelFunctions &myModelRef, int t);
+  
   double fW(vector<double> rv, modelFunctions &myModelRef);
-  ///  double diploidFitness(vector<double> a, vector<double> b, randomv &r, modelFunctions &m); //find diploidFitness from
   double diploidFitness(vector<double> a, vector<double> b, modelFunctions &m); //find diploidFitness from coordinates of each allele
-
+  ///  double diploidFitness(vector<double> a, vector<double> b, randomv &r, modelFunctions &m); //find diploidFitness from
   void setUsePredefinedMutations(bool x){usePredefinedMutations = x;}
   bool getUsePredefinedMutations(void){return usePredefinedMutations;}
   

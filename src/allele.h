@@ -27,7 +27,6 @@ class allele{
   void		 setfW(double x){ fW = x; }
   double         getP(void){ return p; }
   vector<double> getRv(void){ return rv; }
-  double         getW(modelFunctions &myModelRef, environment &envRef);
   int            getId(void){ return id; }
   int            getIdp(void){ return idp; }
   int            getBd(void){ return bd; }

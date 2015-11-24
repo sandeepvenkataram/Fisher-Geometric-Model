@@ -43,6 +43,10 @@ class population{
   //  void           addb(int a, int b); //add a pair of balancing alleles to table
   //  void           printTable(void); //output table
   int            printStates(modelFunctions &myModelRef, environment &envRef, ofstream &fsr);  //print allele pairs interaction terms
+  
+  double fW(vector<double> rv, vector<double> optimum, modelFunctions &myModelRef);
+  double diploidFitness(vector<double> a, vector<double> b, vector<double> optimum, modelFunctions &m); //find diploidFitness from coordinates of each allele
+  
   /*//not used
    *  double getHetA(void) { return hetA; }
    *  double getHetB(void) { return hetB; }
@@ -58,7 +62,6 @@ class population{
   int            updatePhm(modelFunctions &myModelRef);   //! function to update the mean phenotype
   double         u;                 //! mutation rate
   vector<allele> alleles;           //! a vector of alleles
-  vector<allele> allAlleles;           //! a vector of alleles
   void           mutate (randomv &r, modelFunctions &myModelRef, environment &envRef, ofstream &fse); //! performs the mutation step
   void           propagate(randomv &r, modelFunctions &myModelRef, environment &envRef);              //! propagates the population (drift and selection)
   double         updatewm(modelFunctions &myModelRef, environment &envRef);                           //! update mean fitness

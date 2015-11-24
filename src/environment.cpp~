@@ -58,39 +58,38 @@ double environment::fW(vector<double> rv, modelFunctions &myModelRef){
     c = 1
     d = 2
   */
-  double w = 0;
-  //find distance from optimum
- // cerr<<"env.fW";
-  for(int i=0; i<rv.size();i++){
-//	cerr<<" "<<rv[i];
-  }
-
-  double x = myModelRef.vdistance(rv, optimum,0);
-  //apply fitness function
-  //cout<<"current distance is "<<x<<endl;
-  if (myModelRef.getFitnessFunction() == 'g'){
-    //gaussian
-    w = myModelRef.getA()*exp((-1*pow(x,myModelRef.getD()))/(2*pow(myModelRef.getC(),2)));
-	//cout<<x<<"\t"<<w<<endl;
-  }else if(myModelRef.getFitnessFunction() == 'q'){ // quadratic
-    w = 1-pow(x,2)/myModelRef.getA();
-    if(w<0){
-      w=0;
-    }
-  }else if (myModelRef.getFitnessFunction() == 'l'){
-    //linear
-    if(x>=myModelRef.getMaxR()){
-      w = 0;
-    }else{
-      w = myModelRef.getA()*(1-(x/myModelRef.getMaxR()));
-    }
-  }else{
-    cout<<"unknown fitness function: "<<myModelRef.getFitnessFunction() <<endl;
-    exit(1);
-    
-  }
-// cerr<<" "<<w<<endl;
-  return w;
+	double w = 0;
+	double x = myModelRef.vdistance(rv, optimum,0);
+	while(isnan(x)){
+		x = myModelRef.vdistance(rv, optimum,0);
+	}
+	//apply fitness function
+	//cout<<"current distance is "<<x<<endl;
+	while(isnan(w)){
+		if (myModelRef.getFitnessFunction() == 'g'){
+			//gaussian
+			w = myModelRef.getA()*exp((-1*pow(x,myModelRef.getD()))/(2*pow(myModelRef.getC(),2)));
+			//cout<<x<<"\t"<<w<<endl;
+		}else if(myModelRef.getFitnessFunction() == 'q'){ // quadratic
+			w = 1-pow(x,2)/myModelRef.getA();
+			if(w<0){
+			w=0;
+			}
+		}else if (myModelRef.getFitnessFunction() == 'l'){
+			//linear
+			if(x>=myModelRef.getMaxR()){
+			w = 0;
+			}else{
+			w = myModelRef.getA()*(1-(x/myModelRef.getMaxR()));
+			}
+		}else{
+			cout<<"unknown fitness function: "<<myModelRef.getFitnessFunction() <<endl;
+			exit(1);
+			
+		}
+	}
+	cout<<"computed fitness in environment.cpp "<<rv[0]<<" "<<rv[1]<<" "<<x<<" "<<w<<endl;
+	return w;
 }
 
 double environment::diploidFitness(vector<double> a, vector<double> b, modelFunctions &m){
