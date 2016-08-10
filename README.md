@@ -9,6 +9,8 @@ Example input files are hosted in the example/ folder, which also describe the v
 
 <b>Build Instructions</b>
 
-make - makes the program a.out, which contains the simulation software. Requires the gcc compiler
+Extract the archive and change directory into the root directory. This software requires the gcc C++ compiler, along with the GSL library
+
+make - makes the program FGM, which contains the simulation software. Requires the gcc compiler
 
 make clean - removes all built files
