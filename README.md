@@ -7,4 +7,8 @@ Source code is hosted in the src/ folder, and can be compiled if the generated b
 Example input files are hosted in the example/ folder, which also describe the various parameter options and the format of the files
 
 
+<b>Build Instructions</b>
 
+make - makes the program a.out, which contains the simulation software. Requires the gcc compiler
+
+make clean - removes all built files
