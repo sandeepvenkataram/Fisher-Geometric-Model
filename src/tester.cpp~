@@ -22,7 +22,7 @@
 
 //version = 36;
 /*
-  Two dimentional FISHER GEOMETRIC MODEL
+  N dimentional FISHER GEOMETRIC MODEL
 
   Assumptions:
  - Infinite allele model (all new mutations lead to new alleles)
@@ -287,7 +287,7 @@ int main(int argc, char* argv[]){
 	environment	  myEnvironment(opt);
 	environment	 &envRef = myEnvironment;
 	if(possibleMutations.size()>0){
-		cout<<"possible mutations in use"<<endl;
+		//cout<<"possible mutations in use"<<endl;
 		envRef.setUsePredefinedMutations(true);
 		envRef.setPredefinedMutations(possibleMutations);
 	}

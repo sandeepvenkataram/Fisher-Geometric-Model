@@ -1,3 +1,44 @@
+/**
+	tester.cpp
+	Main file to process inputs and run simulation
+	Sandeep Venkataram and Diamantis Sellis
+	Petrov Lab | Stanford University
+
+
+	 Assumptions:
+	 - Infinite allele model (all new mutations lead to new alleles)
+	 - Random mating (Hardy-Weinberg equilibrium)
+	 - New Mutations r~E(lambda), r~N(1,1), r~Gamma(1,1) or r~U(0,4)and theta~U(-pi,pi)
+	 - Fitness landscape s~N(b,c)
+	 - Environment:
+		 o Fixed
+		 o Changing
+			. Periodic (Harmonic oscilator)
+			. Random
+				- Brownian motion
+				- Levy flight
+
+	make
+	 ./a.out initPopulation.dat initEnvironment.dat par.dat output
+
+	output 
+	 single runs
+		   .table	one line per allele for each generation
+		   .ts	   one line per genaration wm etc
+		   .edges	mutation events parent,offspring and time
+		   .b		summary statistics for each run
+
+	file .b
+	column variable 
+	1 meanW average wm across run (excluding burn-in period)
+	2 varianceW variance in wm across run (excluding burn-in period)
+	3 MeanBalanced # of generations with a balanced state
+	4 i total time of run
+	5 adapted did the population adapt?
+	6 tinyWm boolean true if the population is very far from the optimum
+
+*/
+
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -15,46 +56,16 @@
 #include "runningStat.h"
 
 /*
- * Main file to process inputs and run simulation
+ * 
  * 
  */
 
 
 //version = 36;
 /*
-  Two dimentional FISHER GEOMETRIC MODEL
+  N dimentional FISHER GEOMETRIC MODEL
 
-  Assumptions:
- - Infinite allele model (all new mutations lead to new alleles)
- - Random mating (Hardy-Weinberg equilibrium)
- - New Mutations r~E(lambda), r~N(1,1), r~Gamma(1,1) or r~U(0,4)and theta~U(-pi,pi)
- - Fitness landscape s~N(b,c)
- - Environment:
-	 o Fixed
-	 o Changing
-		. Periodic (Harmonic oscilator)
-		. Random
-			- Brownian motion
-			- Levy flight
-
-make
- ./a.out initPopulation.dat initEnvironment.dat par.dat output
-
-output 
- single runs
-	   .table	one line per allele for each generation
-	   .ts	   one line per genaration wm etc
-	   .edges	mutation events parent,offspring and time
-	   .b		summary statistics for each run
-
-file .b
-column variable 
-1 meanW average wm across run (excluding burn-in period)
-2 varianceW variance in wm across run (excluding burn-in period)
-3 MeanBalanced # of generations with a balanced state
-4 i total time of run
-5 adapted did the population adapt?
-6 tinyWm boolean true if the population is very far from the optimum
+ 
 */
 
 using namespace std;
