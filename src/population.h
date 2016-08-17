@@ -6,6 +6,10 @@
 #include "environment.h"
 #include "allele.h"
 
+/*
+	main class which keeps track of populations and conducts the operations involved with simulating evolution (mutation, propogation, selection)
+*/
+
 using namespace std;
 //! version = 3
 class population{

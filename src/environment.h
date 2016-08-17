@@ -1,6 +1,11 @@
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
 
+/*
+	Defines the environment that the population is evolving on, e.g. the position of the phenotypic optimum
+	The code to allow for periodic fluctuation in the optimum's position has not been extensively tested
+*/
+
 #include <vector>
 #include "randomv.h"
 #include "modelFunctions.h"

@@ -15,6 +15,10 @@
 #include "stability.h"
 
 using namespace std;
+
+/*
+	constructor, parameters are sent in from tester.cpp
+*/
 population::population(randomv &r, modelFunctions &myModelRef, vector<allele> &init, int pl, environment &envRef, ofstream &fsr){
   simTime         = 0;
   alleles         = init;
@@ -42,6 +46,7 @@ double population::FindNeutralSphere(modelFunctions &myModelRef){
   return r0;
 }
 
+// run a generation of evolution
 void population::evolve(randomv &r, modelFunctions &myModelRef, environment &envRef, ofstream &fse){
   //cout<<"starting evolve generation "<<simTime<<endl;
   mutate(r, myModelRef, envRef, fse);
@@ -56,6 +61,7 @@ void population::evolve(randomv &r, modelFunctions &myModelRef, environment &env
   simTime++;
 }
 
+// main method to print the current status of the population to file
 void population::printStatus(modelFunctions &myModelRef, ofstream &fp_out, ofstream &fts, environment &envRef, ofstream &fsr){
   /* unused
    *  //make a histogram-vector for currently balanced alleles
@@ -158,6 +164,8 @@ void population::printStatus(modelFunctions &myModelRef, ofstream &fp_out, ofstr
   fts <<endl;
 }
 
+// method to print the genotypes and their fitnesses in a diploid simulation
+// currently not used in the simulation code
 int population::printStates(modelFunctions &myModelRef, environment &envRef, ofstream &fsr){
   for (vector<allele>::iterator it = alleles.begin();
        it != alleles.end(); ++it){
@@ -179,6 +187,8 @@ int population::printStates(modelFunctions &myModelRef, environment &envRef, ofs
   }
   return 1;
 }
+
+// test if there is an allele fixed in the population
 int population::isFixed(int id){
   int present = 0;
   if(alleles.size() == 1){ //if someone is fixed
@@ -194,6 +204,7 @@ int population::isFixed(int id){
   }
 }
 
+// generate new mutations according the the mutation rate, update allele frequencies appropriately
 void population::mutate(randomv &r, modelFunctions &myModelRef, environment &envRef, ofstream &fse){
   //find how many mutations, if any
   int mutationNumber = r.sampleBinomial(u,ploidy*N);///haploid or diploid
@@ -386,6 +397,7 @@ void population::mutate(randomv &r, modelFunctions &myModelRef, environment &env
   }
 }
 
+// propagation involves sexual reproduction assuming hardy-weinberg frequencies and selection and drift through weighted multinomial sampling
 void population::propagate(randomv &r, modelFunctions &myModelRef, environment &envRef){
   ///  vector<allele> temp;  //temporary copy (memory or speed?)
   int counter = 0;
@@ -503,6 +515,7 @@ void population::propagate(randomv &r, modelFunctions &myModelRef, environment &
   delete[] newGeneration;
 }
 
+// update the mean fitness of the population given current genotype frequencies
 double population::updatewm(modelFunctions &myModelRef, environment &envRef){
 	double sum = 0;
 	double varsumSqr = 0; // for calculating the variance
@@ -557,6 +570,7 @@ double population::updatewm(modelFunctions &myModelRef, environment &envRef){
 	}
 	return sum;
 }
+
 
 int population::isAdapted(modelFunctions &myModelRef, environment &envRef){
   // find if 90% of the population is closer than r0
@@ -693,7 +707,7 @@ int population::ispseudoFixed(double threshold){
 }
 
 bool population::areBalanced(modelFunctions &myModelRef, environment &envRef){
-  //check if polymorphism is stable
+  //check if there is a stable polymorphism
   double maxWDiff = 0; //maximum difference between fitness of heterozygote and homozygote with max fitness max(wij-max(wi,wj))
   vector<double> wVector;
   polymorphisms = 0;

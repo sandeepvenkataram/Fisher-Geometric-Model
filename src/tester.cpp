@@ -12,14 +12,14 @@
 	 - Fitness landscape s~N(b,c)
 	 - Environment:
 		 o Fixed
-		 o Changing
+		 o Changing - not supported in current implementation
 			. Periodic (Harmonic oscilator)
 			. Random
 				- Brownian motion
 				- Levy flight
 
 	make
-	 ./a.out initPopulation.dat initEnvironment.dat par.dat output
+	 ./bin/FGM initPopulation.dat initEnvironment.dat par.dat output
 
 	output 
 	 single runs

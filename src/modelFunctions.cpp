@@ -7,6 +7,10 @@
 
 using namespace std;
 
+
+/*
+	default constructor with gaussian fitness function
+*/
 modelFunctions::modelFunctions(randomv &r){
   //for Gaussian
   b = 1; //mean
@@ -118,6 +122,9 @@ vector<double> modelFunctions::polarToCartesian(vector<double> polar){ // conver
 	return Cartesian;
 }
 
+/*
+	add vectors with positions in hyperspherical coordinate space
+*/
 vector<double> modelFunctions::add(vector<double> a, vector<double> b){
   //variables with convenient names
   vector<double> cartA = polarToCartesian(a);
@@ -148,6 +155,9 @@ double modelFunctions::getStep(randomv myR){
   return step;
 }
 
+/*
+	get the mean phenotype of a haploid population given alleles and their frequencies
+*/
 vector<double> modelFunctions::getMeanPhenotype(vector< vector<double> > alleles, vector<double> freqs){
 	vector<double> resultPhenotype;
 	if(alleles.size()!=freqs.size()){

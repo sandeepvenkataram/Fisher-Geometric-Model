@@ -10,7 +10,7 @@ using namespace std;
 
 class stability{
  public:
-  stability(vector<double> ws, int n); // constructor, takes in a vector of fitness values of all relevant genotypes and the number of alleles being considered. the input vector is essentially a row-wise ordering of the upper right half of the nxn fitness matrix (including the diagonal)
+  stability(vector<double> ws, int n); // constructor, takes in a vector of fitness values of all relevant genotypes and the number of alleles being considered
   int stable(void);
   double getMeanFitness(void);
   double getDeterminantA(void){return determinantA;}

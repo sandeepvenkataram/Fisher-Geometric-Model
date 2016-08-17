@@ -4,12 +4,12 @@
 #include <vector>
 #include "randomv.h"
 
-// Class containing the model functions for organisms and the environment
-
+//! Class containing the model functions for organisms and the environment
+//! version = 1;
 using namespace std;
 class modelFunctions {
  public:
-  modelFunctions(randomv &r);
+  modelFunctions(randomv &r); //! constructor
   double fR(randomv myR);     
   double fTheta(randomv myR);
   vector<double> add(vector<double> a, vector<double> b);

@@ -6,7 +6,7 @@
 #include "environment.h"
 
 //! allele class
-/*! It represents a single locus haplotype
+/*! It represents a set of states in a single copy of the genome at all loci
  */
 class allele{
  public:

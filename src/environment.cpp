@@ -6,6 +6,10 @@
 #include "modelFunctions.h"
 #include "environment.h"
 
+
+/*
+	Default constructor, with 2 dimensional landscape and optimum at the origin
+*/
 environment::environment(){
   optimum.push_back(0);
   optimum.push_back(0);
@@ -46,6 +50,9 @@ void environment::change(randomv &rnd, modelFunctions &myModelRef, int t){ //thi
   timeOfChange = t;
 }
 
+/*
+	calculate the fitness of a given position (defined by rv) using the current fitness function
+*/
 double environment::fW(vector<double> rv, modelFunctions &myModelRef){
   /*
     'Gaussian function'
@@ -65,7 +72,7 @@ double environment::fW(vector<double> rv, modelFunctions &myModelRef){
 	}
 	//apply fitness function
 	//cout<<"current distance is "<<x<<endl;
-	if (myModelRef.getFitnessFunction() == 'g'){
+	if (myModelRef.getFitnessFunction() == 'g'){ // gaussian
 		//gaussian
 		w = myModelRef.getA()*exp((-1*pow(x,myModelRef.getD()))/(2*pow(myModelRef.getC(),2)));
 		//cout<<x<<"\t"<<w<<endl;
@@ -74,7 +81,7 @@ double environment::fW(vector<double> rv, modelFunctions &myModelRef){
 		if(w<0){
 		w=0;
 		}
-	}else if (myModelRef.getFitnessFunction() == 'l'){
+	}else if (myModelRef.getFitnessFunction() == 'l'){ // linear
 		//linear
 		if(x>=myModelRef.getMaxR()){
 		w = 0;
@@ -91,6 +98,9 @@ double environment::fW(vector<double> rv, modelFunctions &myModelRef){
 	return w;
 }
 
+/*
+	calculate the fitness of a diploid individual containing 2 alleles with each allele's phenotypic position defined by the vectors a and b
+*/
 double environment::diploidFitness(vector<double> a, vector<double> b, modelFunctions &m){
   //add vectors
   vector<double> newRv = m.add(a, b);
