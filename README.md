@@ -15,4 +15,6 @@ Extract the archive and change directory into the root directory. This software 
 
 `make` - makes the program FGM, which contains the simulation software. Requires the gcc compiler
 
+`make stability` - makes the program stability, which calculates whether a set of alleles can be maintained as a stable polymorphism using the method of Kimura 1969
+
 `make clean` - removes all built files
