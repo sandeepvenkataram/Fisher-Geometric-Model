@@ -30,6 +30,12 @@ class modelFunctions {
   void   setC(double x){ c = x; }
   double getD(void)    { return d; }
   void   setD(double x){ d = x; }
+  double getE(void)    { return e; }
+  void   setE(double x){ e = x; }
+  double getF(void)    { return f; }
+  void   setF(double x){ f = x; }
+  double getG(void)    { return g; }
+  void   setG(double x){ g = x; }
   //parameters for new mutation functions
   vector<double> getParameters(void)   { return parameters; }
   void   setParameters(vector<double> x) { parameters = x; }
@@ -65,6 +71,9 @@ class modelFunctions {
   double a; //! maximum
   double c; //! shape
   double d; //! shape of curve
+  double e;
+  double f;
+  double g;
   //}@
   //for new mutation functions
   vector<double> parameters;
