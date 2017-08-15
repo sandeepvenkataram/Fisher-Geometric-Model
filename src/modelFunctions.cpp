@@ -17,6 +17,9 @@ modelFunctions::modelFunctions(randomv &r){
   c = 1; //shape
   a = 1; //maximum for s
   d = 2;
+  e = 0;
+  f = 0;
+  g = 0;
 }
 
 double modelFunctions::fR(randomv myR){ // sample random magnitude for mutation vector based on parameters
