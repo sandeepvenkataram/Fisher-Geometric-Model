@@ -127,6 +127,7 @@ int main(int argc, char* argv[]){
 	double		 b;		   //shape
 	double		 c;		   //maximum 
 	double		 d;		   //shape of curve 
+	double		 e;		   // error parameter
 	vector<double> parameters;  //new mutation function parameters
 	
 	//environmental parameters
@@ -185,6 +186,9 @@ int main(int argc, char* argv[]){
 	  break;
 	case 'd':
 	  sstr >> d;
+	  break;
+	case 'e':
+	  sstr >> e;
 	  break;
 	case 'f':
 	  sstr >> f;
@@ -313,6 +317,7 @@ int main(int argc, char* argv[]){
 	myModelRef.setB(b);
 	myModelRef.setC(c);
 	myModelRef.setD(d);
+	myModelRef.setE(e);
 	myModelRef.setMutationFunction(f);
 	myModelRef.setParameters(parameters);
 	myModelRef.setWalk(walk);
