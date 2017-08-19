@@ -92,8 +92,8 @@ double environment::fW(vector<double> rv, modelFunctions &myModelRef){
 		double tempD = pow(2, myModelRef.getD());
 		vector<double> optCart = myModelRef.polarToCartesian(optimum);
 		vector<double> posCart = myModelRef.polarToCartesian(rv);
-		xDist = posCart[0]-optCart[0];
-		yDist = posCart[1]-optCart[1];
+		double xDist = posCart[0]-optCart[0];
+		double yDist = posCart[1]-optCart[1];
       		w = myModelRef.getA()*exp(-1*((pow(xDist,tempD) - myModelRef.getB()*xDist*yDist + pow(yDist,tempD))/(2*pow(myModelRef.getC(),2))) ) + myModelRef.getE();
 	}else{
 		cout<<"unknown fitness function: "<<myModelRef.getFitnessFunction() <<endl;
