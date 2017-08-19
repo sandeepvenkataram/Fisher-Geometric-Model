@@ -89,9 +89,9 @@ double environment::fW(vector<double> rv, modelFunctions &myModelRef){
 		w = myModelRef.getA()*(1-(x/myModelRef.getMaxR()));
 		}
 	}else if(myModelRef.getFitnessFunction() == 'd' & myModelRef.getNumDimensions()==2){ // landscape, made by diamantis, code only works on 2 dimensions
-		tempD = pow(2, myModelRef.getD());
-		optCart = myModelRef.polarToCartesian(optimum)
-		posCart = myModelRef.polarToCartesian(rv)
+		double tempD = pow(2, myModelRef.getD());
+		vector<double> optCart = myModelRef.polarToCartesian(optimum)
+		vector<double> posCart = myModelRef.polarToCartesian(rv)
 		xDist = posCart[0]-optCart[0]
 		yDist = posCart[1]-optCart[1]
       		w = myModelRef.getA()*exp(-1*((pow(xDist,tempD) - myModelRef.getB()*xDist*yDist + pow(yDist,tempD))/(2*pow(myModelRef.getC(),2))) ) + myModelRef.getE()
